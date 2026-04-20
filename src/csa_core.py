@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
+from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_harabasz_score
 
 # ===============================
 # FUNGSI DASAR Jarak & Fitness
@@ -216,3 +217,60 @@ def plot_hasil_cluster(X_plot, centroids, labels, list_fitur):
     ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
     plt.tight_layout()
     plt.show()
+
+# ===============================
+# METRIK EVALUASI KUALITAS
+# ===============================
+
+def evaluasi_kualitas_klasterisasi(X, labels, centroids):
+    """
+    Menghitung, menampilkan metriks evaluasi, dan melahirkan kesimpulan teks.
+    """
+    print("=" * 60)
+    print("      HASIL UJI METRIK KUALITAS KLASTERISASI")
+    print("=" * 60)
+    
+    # 1. Silhouette Score
+    # Mengukur seberapa mirip suatu objek dengan klasternya sendiri dibandingkan dengan klaster lain. (-1 hingga 1)
+    sil_score = silhouette_score(X, labels)
+    
+    # 2. Davies-Bouldin Index (DBI)
+    # Mengukur rasio jarak rata-rata ke centroid dibanding jarak antar centroid. (Lebih rendah lebih baik)
+    db_score = davies_bouldin_score(X, labels)
+    
+    # 3. Calinski-Harabasz Index (CH Index)
+    # Mengukur kepadatan klaster (lebih tinggi lebih baik)
+    ch_score = calinski_harabasz_score(X, labels)
+    
+    # 4. SSE (Sum of Squared Errors)
+    sse = evaluate_sse(X, centroids)
+    
+    # 5. MAE (Mean Absolute Error) ke Centroid terdekat
+    # MAE pada clustering dimaknai sebagai rata-rata selisih absolut jarak titik ke pusat klasternya
+    mae_sum = 0
+    for i in range(len(X)):
+        centroid_miliknya = centroids[int(labels[i])] # Mengambil centroid dari data
+        jarak_absolut = np.sum(np.abs(X[i] - centroid_miliknya))
+        mae_sum += jarak_absolut
+    mae = mae_sum / len(X)
+    
+    print(f"1. Silhouette Score          : {sil_score:.4f}")
+    if sil_score > 0.7: print("   [Interpretasi]: SANGAT BAGUS. Data terstruktur dengan kokoh.")
+    elif sil_score > 0.5: print("   [Interpretasi]: BUKTINYA BAIK. Terdapat struktur klaster yang masuk akal.")
+    elif sil_score > 0.25: print("   [Interpretasi]: LEMAH. Klaster saling berdekatan / sedikit tumpang tindih.")
+    else: print("   [Interpretasi]: BURUK. Sebaran data hampir acak tanpa pemisahan tegas.")
+        
+    print(f"\n2. Davies-Bouldin Index (DBI): {db_score:.4f}")
+    if db_score < 1.0: print("   [Interpretasi]: SANGAT BAGUS. Klaster terpisah jauh dengan kepadatan terpusat.")
+    elif db_score < 1.5: print("   [Interpretasi]: BAIK. Pemisahan antar klaster terlihat dan layak dipakai.")
+    else: print("   [Interpretasi]: PERLU PERHATIAN. Batas antar klaster beririsan.")
+        
+    print(f"\n3. Calinski-Harabasz Index   : {ch_score:.4f}")
+    print("   [Interpretasi]: Semakin tinggi angka ini, semakin rapat/padat (dense) klaster Anda.")
+    
+    print(f"\n4. SSE (Sum Squared Error)   : {sse:.4f}")
+    print("   [Interpretasi]: Mengukur kuadrat jarak deviasi. Turunnya SSE di tiap iterasi membuktikan kinerja baik.")
+    
+    print(f"\n5. MAE (Mean Absolute Error) : {mae:.4f}")
+    print("   [Interpretasi]: Rata-rata 'jarak lurus' data meleset dari pusat klaster mereka.")
+    print("=" * 60)
