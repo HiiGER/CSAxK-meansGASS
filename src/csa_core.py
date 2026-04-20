@@ -159,7 +159,10 @@ def final_kmeans(X, initial_centroids):
 # ===============================
 
 def plot_hasil_cluster(X_plot, centroids, labels, list_fitur):
-    \"\"\"\n    Membuat grafik plotter untuk dataset secara otomatis mendeteksi dimensi: \n    Akan menggunakan 3D murni apabila dataset >= 3D.\n    \"\"\"
+    """
+    Membuat grafik plotter untuk dataset secara otomatis mendeteksi dimensi.
+    Akan menggunakan 3D murni apabila dataset >= 3D.
+    """
     n_dim = len(list_fitur)
     num_clusters = len(np.unique(labels))
     cmap = cm.get_cmap('Set1', num_clusters)
@@ -192,7 +195,7 @@ def plot_hasil_cluster(X_plot, centroids, labels, list_fitur):
         
     elif n_dim >= 4:
         # Gunakan PCA 3D untuk memampatkan ke dalam persepsi Spasial 3-Sumbu agar tak terlewat
-        print(f\"-> Dimensi {n_dim}D terdeteksi! Mengecilkan ke Ruang Visual 3D dengan Principal Component Analysis (PCA).\")
+        print(f"-> Dimensi {n_dim}D terdeteksi! Mengecilkan ke Ruang Visual 3D dengan Principal Component Analysis (PCA).")
         pca = PCA(n_components=3)
         X_pca = pca.fit_transform(X_plot)
         centroids_pca = pca.transform(centroids)
