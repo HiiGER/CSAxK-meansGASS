@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import os
 from datetime import datetime
 from sklearn.preprocessing import StandardScaler
 
@@ -9,8 +10,13 @@ def clean_and_preprocess_data(filepath='data/Data Set UMKM.xlsx'):
     Fokus utama: Kapasitas Finansial (Omset & Bantuan).
     """
     print("-> Memuat dataset...")
+    # Menyelesaikan masalah path jika dijalankan dari dalam folder notebooks/
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
+    absolute_filepath = os.path.join(project_root, filepath)
+    
     # Header di baris 1 (index 1), karena baris 0 sepertinya aneh
-    df = pd.read_excel(filepath, header=1)
+    df = pd.read_excel(absolute_filepath, header=1)
     
     # 1. Pilih Kolom yang Relevan untuk Kapasitas Finansial & Operasional
     cols_to_keep = [

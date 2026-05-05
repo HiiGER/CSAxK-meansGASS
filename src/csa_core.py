@@ -14,12 +14,12 @@ def calculate_distance(p1, p2):
     return np.sqrt(np.sum((p1 - p2) ** 2))
 
 def evaluate_sse(data, centroids):
-    sse = 0
-    for i in range(len(data)):
-        distances = [calculate_distance(data[i], c) for c in centroids]
-        min_dist = np.min(distances)
-        sse += (min_dist ** 2)
-    return sse
+    # Vectorized: menghitung jarak semua titik ke semua centroid sekaligus tanpa loop
+    # data: (N, D), centroids: (K, D)
+    diff = data[:, np.newaxis, :] - centroids[np.newaxis, :, :] # Hasil: (N, K, D)
+    dist_sq = np.sum(diff ** 2, axis=2) # Hasil: (N, K)
+    min_dist_sq = np.min(dist_sq, axis=1) # Mengambil jarak kuadrat terdekat untuk setiap titik
+    return np.sum(min_dist_sq)
 
 def evaluate_fitness(sse):
     return 1.0 / (1.0 + sse)
@@ -138,10 +138,10 @@ def final_kmeans(X, initial_centroids):
     clusters = np.zeros(len(X))
     
     while True:
-        new_clusters = np.zeros(len(X))
-        for i in range(len(X)):
-            distances = [calculate_distance(X[i], c) for c in centroids]
-            new_clusters[i] = np.argmin(distances)
+        # Vectorized: menghitung jarak semua titik ke semua centroid sekaligus
+        diff = X[:, np.newaxis, :] - centroids[np.newaxis, :, :] # (N, K, D)
+        dist_sq = np.sum(diff ** 2, axis=2) # (N, K)
+        new_clusters = np.argmin(dist_sq, axis=1) # (N,)
             
         if np.array_equal(clusters, new_clusters):
             break 
