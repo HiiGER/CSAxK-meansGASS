@@ -22,3 +22,9 @@ __pycache__/
 # data/
 # *.csv
 # *.xlsx
+
+
+#doc
+docs/
+extract_metrics.py
+scratch_copy_kmeans.py
